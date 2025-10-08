@@ -1,20 +1,34 @@
-from fastapi import APIRouter 
-from app.core.db import  SessionDep
-from app.models.quants import QuantsAlphaRecordModel
-from bc_fastkit.crud import CRUDBase
-from typing import List
-from bc_fastkit.schema import create_default_cru_schema
+from bc_fastkit.api import create_commit_session_router, CRUDRequestHandler
+from app.core.db import SessionDep
+from app import crud, schema
 
-router = APIRouter()
+router = create_commit_session_router()
 
-record_schema = create_default_cru_schema(
-    QuantsAlphaRecordModel)
+@router.crud("/inspiration", 
+             handler=crud.quants_inspiration_handler,
+            schema=schema.quants_inspiration_schema,
+            session_dep=SessionDep
+             )
+class InspirationRequest(CRUDRequestHandler):
+    pass
 
-crud_record = CRUDBase(QuantsAlphaRecordModel)
+@router.crud("/alpha-template",
+             handler=crud.quants_alpha_template_handler,
+             schema=schema.quants_alpha_template_schema,
+             session_dep=SessionDep)
+class AlphaTemplateRequest(CRUDRequestHandler):
+    pass
 
-@router.get("/", response_model=List[record_schema.R])
-async def get_alphas(db: SessionDep):
-    rs = crud_record.search(db, {})
-    print(rs)
-    return rs
+@router.crud("/wqb/alpha",
+             handler=crud.quants_wqb_alpha_handler,
+             schema=schema.quants_wqb_alpha_schema,
+             session_dep=SessionDep)
+class WqbAlphaRequest(CRUDRequestHandler):
+    pass
 
+@router.crud("/wqb/alpha-template",
+             handler=crud.quants_wqb_alpha_template_task_handler,
+             schema=schema.quants_wqb_alpha_template_task_schema,
+             session_dep=SessionDep)
+class WqbAlphaTemplateTaskRequest(CRUDRequestHandler):
+    pass

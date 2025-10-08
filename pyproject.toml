@@ -63,4 +63,3 @@ bc-fastkit = {develop = true}
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^4.3.0"
-

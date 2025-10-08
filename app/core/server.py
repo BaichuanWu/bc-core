@@ -1,9 +1,11 @@
 from contextlib import asynccontextmanager
+
+import sentry_sdk
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-import sentry_sdk
 
 from config import settings
+
 
 def create_app() -> FastAPI:
     app = FastAPI(

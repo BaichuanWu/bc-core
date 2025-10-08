@@ -1,9 +1,11 @@
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, Session
+from typing import Annotated, AsyncGenerator
+
 from fastapi import Depends
+from sqlalchemy import create_engine
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.orm import Session, sessionmaker
+
 from config import settings
-from typing import AsyncGenerator, Annotated
 
 # 构建异步 MySQL 数据库 URL
 ASYNC_MYSQL_URL = (

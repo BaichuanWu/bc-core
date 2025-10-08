@@ -1,9 +1,10 @@
 from bc_fastkit.crud import CRUDBase
+
 from app.models.quants import (
     QuantsAlphaTemplateModel,
+    QuantsInspirationModel,
     QuantsWqbAlphaModel,
     QuantsWqbAlphaTemplateTaskModel,
-    QuantsInspirationModel
 )
 
 quants_inspiration_handler = CRUDBase(QuantsInspirationModel)

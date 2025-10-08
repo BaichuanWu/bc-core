@@ -1,7 +1,13 @@
-from .quants import *
+from .quants import (
+    quants_alpha_template_handler,
+    quants_inspiration_handler,
+    quants_wqb_alpha_handler,
+    quants_wqb_alpha_template_task_handler,
+)
+
 __all__ = [
     "quants_inspiration_handler",
     "quants_wqb_alpha_handler",
     "quants_alpha_template_handler",
-    "quants_wqb_alpha_template_task_handler"
+    "quants_wqb_alpha_template_task_handler",
 ]

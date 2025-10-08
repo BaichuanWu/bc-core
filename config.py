@@ -1,5 +1,6 @@
-from pydantic_settings import BaseSettings
 from pydantic import BaseModel
+from pydantic_settings import BaseSettings
+
 
 class MySQLConfig(BaseModel):
     host: str = "localhost"
@@ -7,6 +8,7 @@ class MySQLConfig(BaseModel):
     user: str = "root"
     password: str = "password"
     db: str = "test_db"
+
 
 class Settings(BaseSettings):
     API_PREFIX: str = "/api"
@@ -17,6 +19,7 @@ class Settings(BaseSettings):
 
     class Config:
         env_file = ".env"
-        env_nested_delimiter = '__'
+        env_nested_delimiter = "__"
+
 
 settings = Settings()

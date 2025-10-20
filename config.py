@@ -16,6 +16,8 @@ class Settings(BaseSettings):
     SENRTY_URL: str = ""
     REDIS_URL: str = "redis://localhost:6379/0"
     MYSQL: MySQLConfig = MySQLConfig()
+    Q_ACCOUNT: str = ""
+    Q_PASSWORD: str = ""
 
     class Config:
         env_file = ".env"

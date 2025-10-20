@@ -1,13 +1,16 @@
+from bc_fastkit.model import BaseModel
+
 from .quants import (
     QuantsAlphaTemplateModel,
     QuantsInspirationModel,
     QuantsWqbAlphaModel,
-    QuantsWqbAlphaTemplateTaskModel,
+    QuantsWqbAlphaTaskModel,
 )
 
 __all__ = [
     "QuantsInspirationModel",
     "QuantsAlphaTemplateModel",
     "QuantsWqbAlphaModel",
-    "QuantsWqbAlphaTemplateTaskModel",
+    "QuantsWqbAlphaTaskModel",
+    "BaseModel",
 ]

@@ -1,0 +1,229 @@
+{
+    "id": "pwYAXVvg",
+    "type": "REGULAR",
+    "author": "BW15840",
+    "settings": {
+        "instrumentType": "EQUITY",
+        "region": "USA",
+        "universe": "TOP3000",
+        "delay": 1,
+        "decay": 10,
+        "neutralization": "SUBINDUSTRY",
+        "truncation": 0.05,
+        "pasteurization": "ON",
+        "unitHandling": "VERIFY",
+        "nanHandling": "ON",
+        "maxTrade": "ON",
+        "language": "FASTEXPR",
+        "visualization": false,
+        "startDate": "2013-01-20",
+        "endDate": "2023-01-20"
+    },
+    "regular": {
+        "code": "ranked_signal = ts_entropy(vec_avg(ern4_nexterntod), 20);signal = group_zscore(ranked_signal,SECTOR);-ts_mean(signal, 5)",
+        "description": "Idea:\nCapture near-term mean-reverting behavior in sector-level entropy of earnings-related activity by analyzing the information complexity of next-earnings-today variables.\n\nRationale for data used:\n\nern4_nexterntod likely reflects forward-looking earnings or event-related data, such as next earnings timing or updates.\n\nvec_avg(...) smooths fluctuations across data points, creating a more stable signal.\n\nts_entropy(..., 20) measures the information entropy (or unpredictability) of the variable over a 20-day window \u2014 higher entropy suggests uncertainty or dispersed market reactions.\n\nRationale for operators used:\n\ngroup_zscore(..., SECTOR) standardizes the entropy signal within each sector, allowing fair cross-sector comparison while controlling for sector-specific volatility.\n\nts_mean(..., 5) computes a short-term average, emphasizing recent tendencies.\n\nThe negative sign (-) implies a contrarian stance \u2014 betting that sectors with recently high information entropy (market confusion or overreaction) will mean-revert.",
+        "operatorCount": 5
+    },
+    "dateCreated": "2025-10-20T01:47:28-04:00",
+    "dateSubmitted": "2025-10-20T01:57:01-04:00",
+    "dateModified": "2025-10-20T05:58:12-04:00",
+    "name": null,
+    "favorite": false,
+    "hidden": false,
+    "color": null,
+    "category": null,
+    "tags": [
+        "PowerPoolSelected"
+    ],
+    "classifications": [
+        {
+            "id": "DATA_USAGE:SINGLE_DATA_SET",
+            "name": "Single Data Set Alpha"
+        },
+        {
+            "id": "POWER_POOL:POWER_POOL_ELIGIBLE",
+            "name": "Power Pool Alpha"
+        }
+    ],
+    "grade": null,
+    "stage": "OS",
+    "status": "ACTIVE",
+    "is": {
+        "pnl": 7051552,
+        "bookSize": 20000000,
+        "longCount": 1250,
+        "shortCount": 1540,
+        "turnover": 0.0957,
+        "returns": 0.0706,
+        "drawdown": 0.1189,
+        "margin": 0.001476,
+        "sharpe": 1.37,
+        "fitness": 1.03,
+        "startDate": "2013-01-20",
+        "riskNeutralized": {
+            "pnl": 4152781,
+            "bookSize": 20000000,
+            "longCount": 1250,
+            "shortCount": 1540,
+            "turnover": 0.0957,
+            "returns": 0.0416,
+            "drawdown": 0.0749,
+            "margin": 0.000869,
+            "fitness": 0.66,
+            "sharpe": 1.14
+        },
+        "selfCorrelation": 0.4882,
+        "prodCorrelation": 0.6593,
+        "checks": [
+            {
+                "name": "LOW_SHARPE",
+                "result": "WARNING",
+                "limit": 1.58,
+                "value": 1.37
+            },
+            {
+                "name": "LOW_FITNESS",
+                "result": "PASS",
+                "limit": 1.0,
+                "value": 1.03
+            },
+            {
+                "name": "LOW_TURNOVER",
+                "result": "PASS",
+                "limit": 0.01,
+                "value": 0.0957
+            },
+            {
+                "name": "HIGH_TURNOVER",
+                "result": "PASS",
+                "limit": 0.7,
+                "value": 0.0957
+            },
+            {
+                "name": "CONCENTRATED_WEIGHT",
+                "result": "PASS"
+            },
+            {
+                "name": "LOW_SUB_UNIVERSE_SHARPE",
+                "result": "PASS",
+                "limit": 0.59,
+                "value": 1.07
+            },
+            {
+                "name": "LOW_2Y_SHARPE",
+                "result": "PASS",
+                "value": 2.26,
+                "limit": 1.58
+            },
+            {
+                "name": "POWER_POOL_CORRELATION",
+                "result": "PENDING"
+            },
+            {
+                "name": "MATCHES_COMPETITION",
+                "result": "WARNING",
+                "competitions": [
+                    {
+                        "id": "AIAC2025",
+                        "name": "AI Alphas Competition 2025"
+                    }
+                ]
+            },
+            {
+                "result": "PASS",
+                "name": "MATCHES_PYRAMID",
+                "effective": 1,
+                "multiplier": 1.2,
+                "pyramids": [
+                    {
+                        "name": "USA/D1/EARNINGS",
+                        "multiplier": 1.2
+                    }
+                ]
+            },
+            {
+                "result": "WARNING",
+                "name": "MATCHES_THEMES",
+                "themes": [
+                    {
+                        "id": "7Be7JE4",
+                        "multiplier": 2.0,
+                        "name": "EUR Risk Neutralization Theme"
+                    }
+                ]
+            }
+        ]
+    },
+    "os": {
+        "startDate": "2023-01-21",
+        "osISSharpeRatio": null,
+        "preCloseSharpeRatio": null,
+        "checks": [
+            {
+                "name": "SHARPE",
+                "result": "PENDING"
+            },
+            {
+                "name": "DRAWDOWN",
+                "result": "PENDING"
+            },
+            {
+                "name": "PROD_CORRELATION",
+                "result": "PENDING"
+            },
+            {
+                "name": "MEMORY_USAGE",
+                "result": "PENDING"
+            },
+            {
+                "name": "NEW_HIGH",
+                "result": "PENDING"
+            },
+            {
+                "name": "SELF_CORRELATION",
+                "result": "PENDING"
+            },
+            {
+                "name": "SUB_UNIVERSE_SHARPE",
+                "result": "PENDING"
+            },
+            {
+                "name": "RANK_SHARPE",
+                "result": "PENDING"
+            },
+            {
+                "name": "SUPER_UNIVERSE_SHARPE",
+                "result": "PENDING"
+            },
+            {
+                "name": "CONCENTRATED_WEIGHT",
+                "result": "PENDING"
+            },
+            {
+                "name": "IS_SHARPE",
+                "result": "PENDING"
+            }
+        ]
+    },
+    "train": null,
+    "test": null,
+    "prod": null,
+    "competitions": [],
+    "themes": [],
+    "pyramids": [
+        {
+            "name": "USA/D1/EARNINGS",
+            "multiplier": 1.2
+        }
+    ],
+    "pyramidThemes": {
+        "effective": 1,
+        "pyramids": [
+            {
+                "name": "USA/D1/EARNINGS",
+                "multiplier": 1.2
+            }
+        ]
+    },
+    "team": null
+}

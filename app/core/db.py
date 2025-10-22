@@ -19,7 +19,7 @@ SYNC_MYSQL_URL = (
 )
 
 # 创建异步 Engine 和 Session
-async_engine = create_async_engine(ASYNC_MYSQL_URL, echo=True, future=True)
+async_engine = create_async_engine(ASYNC_MYSQL_URL, echo=False, future=True)
 async_session = async_sessionmaker(
     async_engine,
     expire_on_commit=False,
@@ -27,7 +27,7 @@ async_session = async_sessionmaker(
     autoflush=False,
     autocommit=False,
 )
-sync_engine = create_engine(SYNC_MYSQL_URL, echo=True, future=True)
+sync_engine = create_engine(SYNC_MYSQL_URL, echo=False, future=True)
 sync_session = sessionmaker(
     sync_engine,
     expire_on_commit=False,

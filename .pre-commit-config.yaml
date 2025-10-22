@@ -21,7 +21,7 @@ repos:
     hooks:
       # Run the linter.
       - id: ruff-check
-        args: [ --fix ]
+        args: ["--fix", "--exclude", "*.ipynb"]
       # Run the formatter.
       # - id: ruff-format
   # 4. Flake8 - 仅检查，不自动修改

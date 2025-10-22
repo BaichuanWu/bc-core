@@ -1,41 +1,10 @@
-import asyncio
+from wqb import FilterRange
 
-from app.services.quants.worldbrain import WorldQuantClient
-
-d = (
-    {
-        "type": "REGULAR",
-        "settings": {
-            "instrumentType": "EQUITY",
-            "region": "USA",
-            "universe": "TOP3000",
-            "delay": 1,
-            "decay": 10,
-            "neutralization": "SUBINDUSTRY",
-            "truncation": 0.05,
-            "pasteurization": "ON",
-            "testPeriod": "P0Y0M",
-            "unitHandling": "VERIFY",
-            "nanHandling": "ON",
-            "maxTrade": "ON",
-            "language": "FASTEXPR",
-            "visualization": False,
-        },
-        "regular": """ranked_signal = ts_zscore(vec_sum(ern4_impliedee), 120);
-        signal = group_zscore(ranked_signal,SUBINDUSTRY);
-        ts_product(signal, 120)""",
-    },
-)
-
-
-async def main():
-    client = WorldQuantClient()
-    resp = await client.simulate_alpha(d)
-    print(resp)
-
+from app.services.quants.worldbrain import db, wqb_client
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    wqb_client.sync_simulate_alpha(sharpe=FilterRange.from_str("(-inf,-1)"))
+    db.commit()
 # resp = client.get_dataset_list(
 #     region="USA",
 #     delay=1,

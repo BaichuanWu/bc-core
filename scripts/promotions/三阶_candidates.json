@@ -1,0 +1,57 @@
+[
+  {
+    "id": "3rd-1",
+    "source": "group_rank(ts_delta(anl69_dps_new_best_crncy_iso,120), SUBINDUSTRY)",
+    "regular": "ts_zscore(group_rank(ts_delta(anl69_dps_new_best_crncy_iso,120), SUBINDUSTRY), 63)",
+    "settings": {
+      "instrumentType": "EQUITY",
+      "region": "USA",
+      "neutralization": "SUBINDUSTRY"
+    },
+    "reason": "对二阶结果在时间维度做 zscore（ts_zscore）以抑制长期共同波动与规模/波动率驱动，从而降低与 prod alpha 的相关性（不使用额外 group 操作符）。"
+  },
+  {
+    "id": "3rd-2",
+    "source": "group_rank(ts_delta(anl69_dps_new_best_crncy_iso,120), SUBINDUSTRY)",
+    "regular": "ts_backfill(ts_decay_linear(normalize(group_rank(ts_delta(anl69_dps_new_best_crncy_iso,120), SUBINDUSTRY)), 5), 3)",
+    "settings": {
+      "instrumentType": "EQUITY",
+      "region": "USA",
+      "neutralization": "SUBINDUSTRY"
+    },
+    "reason": "对二阶结果先 normalize 再做线性衰减并回填（ts_decay_linear + ts_backfill），平滑并减少由极端值导致的相关性。"
+  },
+  {
+    "id": "3rd-3",
+    "source": "group_rank(ts_delta(anl69_dps_new_best_crncy_iso,120), SUBINDUSTRY)",
+    "regular": "ts_delay(group_rank(ts_delta(anl69_dps_new_best_crncy_iso,120), SUBINDUSTRY), 5)",
+    "settings": {
+      "instrumentType": "EQUITY",
+      "region": "USA",
+      "neutralization": "SUBINDUSTRY"
+    },
+    "reason": "对二阶结果做滞后（ts_delay），捕捉延迟信号或与 prod alpha 在时间上的错位以降低即时相关性。"
+  },
+  {
+    "id": "3rd-4",
+    "source": "group_rank(ts_delta(anl69_dps_new_best_crncy_iso,120), SUBINDUSTRY)",
+    "regular": "ts_product(ts_mean(group_rank(ts_delta(anl69_dps_new_best_crncy_iso,120), SUBINDUSTRY), 5), ts_mean(group_rank(ts_delta(anl69_dps_new_best_crncy_iso,120), SUBINDUSTRY), 20))",
+    "settings": {
+      "instrumentType": "EQUITY",
+      "region": "USA",
+      "neutralization": "SUBINDUSTRY"
+    },
+    "reason": "用短/中期均值的乘积（ts_product）捕捉非线性交互，通常与线性 prod alpha 相关性较低。"
+  },
+  {
+    "id": "3rd-5",
+    "source": "group_rank(ts_delta(anl69_dps_new_best_crncy_iso,120), SUBINDUSTRY)",
+    "regular": "trade_when(volume > ts_mean(volume, 60) * 2, group_rank(ts_delta(anl69_dps_new_best_crncy_iso,120), SUBINDUSTRY), 0)",
+    "settings": {
+      "instrumentType": "EQUITY",
+      "region": "USA",
+      "neutralization": "SUBINDUSTRY"
+    },
+    "reason": "使用 MCP 的 `trade_when` 操作符：仅在大成交量时激活二阶信号（减少稀疏/噪声贡献），否则返回 0；注意需要 `volume` 字段支持。"
+  }
+]

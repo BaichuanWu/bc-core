@@ -99,7 +99,7 @@ optional = false
 python-versions = ">=3.12"
 groups = ["main"]
 files = []
-develop = true
+develop = false
 
 [package.dependencies]
 aiomysql = ">=0.2.0,<0.3.0"
@@ -107,7 +107,6 @@ fastapi = ">=0.117.1,<0.118.0"
 humps = ">=0.2.2,<0.3.0"
 pydantic-settings = ">=2.11.0,<3.0.0"
 sqlalchemy = {version = ">=2.0.43,<3.0.0", extras = ["asyncio"]}
-sqlmodel = ">=0.0.25,<0.0.26"
 
 [package.source]
 type = "directory"

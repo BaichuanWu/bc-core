@@ -6,7 +6,9 @@
       "type": "debugpy",
       "request": "launch",
       "program": "${file}",
-      "console": "integratedTerminal"
+      "console": "integratedTerminal",
+      "justMyCode": false,
+      "subProcess": true           // 若库在子进程中运行，也能附加
     },
     {
       "name": "Run uvicorn (module) - bc-core",

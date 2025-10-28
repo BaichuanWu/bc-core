@@ -1,3 +1,4 @@
+import hashlib
 import math
 import re
 from typing import Any, Sequence
@@ -10,7 +11,9 @@ from app.models.quants import (
     QuantsInspirationModel,
     QuantsWqbAlphaModel,
     QuantsWqbAlphaTaskModel,
+    QuantsWqbDataFieldModel,
     QuantsWqbOperatorModel,
+    QuantsWqbUniverseModel,
 )
 
 
@@ -103,10 +106,17 @@ class CRUDWqbAlphaTemplateTask(CRUDBase):
         pass
 
 
-class CRUDWqbAlpha(CRUDBase):
+class CRUDWqbAlpha(CRUDBase[QuantsWqbAlphaModel]):
     def complement_obj_in(self, db: Session, *, obj_in):
         if "expression" in obj_in:
             obj_in["expression"] = normalize_expr(obj_in["expression"])
+        if "wqb_data" in obj_in:
+            obj_in["sharpe"] = (obj_in["wqb_data"]["is"]["sharpe"],)
+            obj_in["fitness"] = obj_in["wqb_data"]["is"]["fitness"]
+        if "setting_str" in obj_in and "expression" in obj_in:
+            obj_in["expression_hash"] = hashlib.sha256(
+                (obj_in["setting_str"] + obj_in["expression"]).encode("utf-8")
+            ).hexdigest()
         return super().complement_obj_in(db, obj_in=obj_in)
 
 
@@ -115,3 +125,5 @@ quants_alpha_template_handler = CRUDBase(QuantsAlphaTemplateModel)
 quants_wqb_alpha_handler = CRUDWqbAlpha(QuantsWqbAlphaModel)
 quants_wqb_alpha_task_handler = CRUDWqbAlphaTemplateTask(QuantsWqbAlphaTaskModel)
 quants_wqb_operator_handler = CRUDBase(QuantsWqbOperatorModel)
+quants_wqb_data_field_handler = CRUDBase(QuantsWqbDataFieldModel)
+quants_wqb_universe_handler = CRUDBase(QuantsWqbUniverseModel)

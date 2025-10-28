@@ -3,7 +3,9 @@ from .quants import (
     quants_inspiration_handler,
     quants_wqb_alpha_handler,
     quants_wqb_alpha_task_handler,
+    quants_wqb_data_field_handler,
     quants_wqb_operator_handler,
+    quants_wqb_universe_handler,
 )
 
 __all__ = [
@@ -12,4 +14,6 @@ __all__ = [
     "quants_alpha_template_handler",
     "quants_wqb_alpha_task_handler",
     "quants_wqb_operator_handler",
+    "quants_wqb_data_field_handler",
+    "quants_wqb_universe_handler",
 ]

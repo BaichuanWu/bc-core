@@ -1,0 +1,22 @@
+[
+{
+  "type": "REGULAR",
+  "settings": {
+    "instrumentType": "EQUITY",
+    "region": "USA",
+    "universe": "ILLIQUID_MINVOL1M",
+    "delay": 1,
+    "decay": 5,
+    "neutralization": "SUBINDUSTRY",
+    "truncation": 0.05,
+    "pasteurization": "ON",
+    "testPeriod": "P0Y0M",
+    "unitHandling": "VERIFY",
+    "nanHandling": "ON",
+    "maxTrade": "ON",
+    "language": "FASTEXPR",
+    "visualization": false
+  },
+  "regular": "ranked_signal = ts_entropy(ern3_all_delay_1_next_interval, 5,10,20,60,120);gp = group_cartesian_product(country, SUBINDUSTRY);signal = group_rank(ranked_signal, gp);ts_product(ranked_signal, 5,10,20,60,120)"
+}
+]

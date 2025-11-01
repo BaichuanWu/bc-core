@@ -1,8 +1,3 @@
-import hashlib
-import math
-import re
-from typing import Any, Sequence
-
 from bc_fastkit.crud import CRUDBase
 from sqlalchemy.orm import Session
 
@@ -15,90 +10,7 @@ from app.models.quants import (
     QuantsWqbOperatorModel,
     QuantsWqbUniverseModel,
 )
-
-
-def normalize_expr(
-    s: str, remove_whitespace: bool = True, newline_after_semicolon: bool = True
-) -> str:
-    """
-    标准化表达式字符串：
-      - remove_whitespace=True 时，删除引号外的所有空白字符（保留引号内的空白）
-      - newline_after_semicolon=True 时，把每个分号及其后面的空白替换为 ';\n'
-    返回去除首尾空白的结果（末尾不会多余换行）。
-    """
-    if not isinstance(s, str):
-        raise TypeError("输入必须是字符串")
-
-    def _remove_ws_outside_quotes(text: str) -> str:
-        # 把双引号或单引号内的片段保留为独立段落，其余段落删除空白
-        parts = re.split(r'(".*?"|\'.*?\')', text)
-        for i in range(0, len(parts), 2):  # 偶数索引是引号外的片段
-            parts[i] = re.sub(r"\s+", "", parts[i])
-        return "".join(parts)
-
-    out = s
-    if remove_whitespace:
-        out = _remove_ws_outside_quotes(out)
-
-    if newline_after_semicolon:
-        # 把分号及其后跟随的任意空白，替换为 ';\n'
-        out = re.sub(r";\s*", ";\n", out)
-
-    # 去除首尾空白与多余换行
-    out = out.strip()
-    # 如果最后字符是换行，则去掉
-    out = out.rstrip("\n")
-    return out
-
-
-def score_by_adjacent_changes(
-    rows: Sequence[Sequence[Any]],
-    value_index: int = 2,
-) -> int:
-    """
-    rows: 序列，每项为 list/tuple，value_index 指定用于检测变化的数值索引（默认第3项）
-    返回 int 分数，范围 [-50, 50]
-    """
-
-    def sign(x: float) -> int:
-        if x > 0:
-            return 1
-        if x < 0:
-            return -1
-        return 0
-
-    n = len(rows)
-    if n < 2:
-        return 0  # 无法定义变化，返回中性 0（你也可以改成 -50 或其它）
-    # 提取序列并转换为数字（尽量容错）
-    vals = []
-    for r in rows:
-        try:
-            v = r[value_index]
-            # 如果 v 是字符串包含数字，尝试转为 float
-            if isinstance(v, str):
-                v = float(v) if v.strip() != "" else 0.0
-            else:
-                v = float(v)
-        except Exception:
-            # 转换失败则当作 0 处理
-            v = 0.0
-        vals.append(v)
-
-    # 计算相邻符号变化次数
-    changes = 0
-    prev_s = sign(vals[0])
-    for x in vals[1:]:
-        s = sign(x)
-        if s != prev_s:
-            changes += 1
-        prev_s = s
-
-    max_changes = n - 1
-    r = changes / max_changes if max_changes > 0 else 0.0
-    score = r * 100.0 - 50.0
-    # 四舍五入并转 int
-    return int(math.floor(score + 0.5)) if score >= 0 else int(math.ceil(score - 0.5))
+from app.utils import convert_iso_time_str_to_datetime
 
 
 class CRUDWqbAlphaTemplateTask(CRUDBase):
@@ -107,17 +19,114 @@ class CRUDWqbAlphaTemplateTask(CRUDBase):
 
 
 class CRUDWqbAlpha(CRUDBase[QuantsWqbAlphaModel]):
+
     def complement_obj_in(self, db: Session, *, obj_in):
         if "expression" in obj_in:
-            obj_in["expression"] = normalize_expr(obj_in["expression"])
+            obj_in["expression"] = self.model.normalize_expr(obj_in["expression"])
+        if "settings" in obj_in:
+            settings = obj_in["settings"]
+            obj_in["region"] = settings["region"]
+            obj_in["universe"] = settings["universe"]
+            obj_in["delay"] = settings["delay"]
         if "wqb_data" in obj_in:
             obj_in["sharpe"] = (obj_in["wqb_data"]["is"]["sharpe"],)
             obj_in["fitness"] = obj_in["wqb_data"]["is"]["fitness"]
-        if "setting_str" in obj_in and "expression" in obj_in:
-            obj_in["expression_hash"] = hashlib.sha256(
-                (obj_in["setting_str"] + obj_in["expression"]).encode("utf-8")
-            ).hexdigest()
+        if "settings" in obj_in and "expression" in obj_in:
+            obj_in["expression_hash"] = self.model.generate_expression_hash(
+                obj_in["expression"], obj_in["settings"]
+            )
         return super().complement_obj_in(db, obj_in=obj_in)
+
+    def get_by_expression_and_settings(
+        self, db: Session, *, expression: str, settings: dict
+    ) -> QuantsWqbAlphaModel | None:
+        expression_hash = self.model.generate_expression_hash(expression, settings)
+        print("Searching for expression hash:", expression_hash)
+        return (
+            db.query(self.model)
+            .filter(self.model.expression_hash == expression_hash)
+            .first()
+        )
+
+    def create_or_update_by_wqb_data(
+        self, db: Session, *, data: dict
+    ) -> QuantsWqbAlphaModel:
+        obj_in = {
+            "wqb_alpha_id": data["id"],
+            "expression": data["regular"]["code"],
+            "operator_count": data["regular"]["operatorCount"],
+            "description": data["regular"].get("description", "") or "",
+            "region": data["settings"]["region"],
+            "universe": data["settings"]["universe"],
+            "delay": data["settings"]["delay"],
+            "wqb_data": data,
+            "wqb_create_time": data.get("dateCreated")
+            and convert_iso_time_str_to_datetime(data["dateCreated"]),
+            "wqb_modified_time": data.get("dateModified")
+            and convert_iso_time_str_to_datetime(data["dateModified"]),
+            "wqb_submitted_time": data.get("dateSubmitted")
+            and convert_iso_time_str_to_datetime(data["dateSubmitted"]),
+            "settings": data["settings"],
+        }
+        state = quants_wqb_alpha_handler.model.state_from_str(data["status"])
+
+        prev = quants_wqb_alpha_handler.search_one(
+            db, q={"wqb_alpha_id": obj_in["wqb_alpha_id"]}
+        )
+        if not prev:
+            prev = quants_wqb_alpha_handler.get_by_expression_and_settings(
+                db,
+                expression=obj_in["expression"],
+                settings=obj_in["settings"],
+            )
+
+        if prev:
+            if state > prev.state:
+                obj_in["state"] = state
+            return quants_wqb_alpha_handler.update(
+                db,
+                obj_in=obj_in | {"id": prev.id},
+            )
+        else:
+            return quants_wqb_alpha_handler.create(db, obj_in=obj_in)
+
+
+class CRUDWqbDataField(CRUDBase[QuantsWqbDataFieldModel]):
+    def create_or_update_by_wqb_data(
+        self, db: Session, *, data: dict
+    ) -> QuantsWqbDataFieldModel:
+        obj_in = {
+            "region": data["region"],
+            "delay": data["delay"],
+            "universe": data["universe"],
+            "dataset_id": data["dataset"]["id"],
+            "typ": quants_wqb_data_field_handler.model.typ_from_str(data["type"]),
+            "category": data["category"]["id"],
+            "sub_category": data.get("subcategory", {}).get("id") or "",
+            "name": data["id"],
+            "description": data["description"],
+            "payramid_multiplier": data["pyramidMultiplier"],
+            "coverage": data["coverage"],
+            "user_count": data["userCount"],
+            "alpha_count": data["alphaCount"],
+        }
+        prev = quants_wqb_data_field_handler.search_one(
+            db,
+            q={
+                "region": obj_in["region"],
+                "universe": obj_in["universe"],
+                "delay": obj_in["delay"],
+                "dataset_id": obj_in["dataset_id"],
+                "name": obj_in["name"],
+            },
+        )
+        if prev:
+            return quants_wqb_data_field_handler.update(
+                db,
+                obj_in={**obj_in, "id": prev.id},
+            )
+        else:
+            return quants_wqb_data_field_handler.create(db, obj_in=obj_in)
 
 
 quants_inspiration_handler = CRUDBase(QuantsInspirationModel)
@@ -125,5 +134,5 @@ quants_alpha_template_handler = CRUDBase(QuantsAlphaTemplateModel)
 quants_wqb_alpha_handler = CRUDWqbAlpha(QuantsWqbAlphaModel)
 quants_wqb_alpha_task_handler = CRUDWqbAlphaTemplateTask(QuantsWqbAlphaTaskModel)
 quants_wqb_operator_handler = CRUDBase(QuantsWqbOperatorModel)
-quants_wqb_data_field_handler = CRUDBase(QuantsWqbDataFieldModel)
+quants_wqb_data_field_handler = CRUDWqbDataField(QuantsWqbDataFieldModel)
 quants_wqb_universe_handler = CRUDBase(QuantsWqbUniverseModel)

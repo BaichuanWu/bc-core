@@ -55,7 +55,7 @@ async def get_wqb_operator_list(db: SessionDep):
 
 @router.post("/wqb/operator-list", response_model=schema.quants_wqb_operator_schema.QR)
 async def refresh_wqb_operator_list(db: SessionDep):
-    wqb_client.sync_operators(db)
+    wqb_client.fetch_operators(db)
     data, total = crud.quants_wqb_operator_handler.search_limit(db, {})
     return {"dataSource": data, "total": total}
 

@@ -5,6 +5,7 @@ from .quants import (
     QuantsInspirationModel,
     QuantsWqbAlphaModel,
     QuantsWqbAlphaTaskModel,
+    QuantsWqbDataFieldModel,
 )
 
 __all__ = [
@@ -13,4 +14,5 @@ __all__ = [
     "QuantsWqbAlphaModel",
     "QuantsWqbAlphaTaskModel",
     "BaseModel",
+    "QuantsWqbDataFieldModel",
 ]

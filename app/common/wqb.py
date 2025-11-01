@@ -1,0 +1,10 @@
+NEUTRALIZATION_OPERATORS = [
+    "MARKET",
+    "SUBINDUSTRY",
+    "INDUSTRY",
+    "SECTOR",
+]
+
+COUNTRY_GROUPING_REGIONS = ["ASI", "GLB", "EUR"]
+
+COUNTRY_GROUPING_OPERATOR = "group_cartesian_product(country, {})"

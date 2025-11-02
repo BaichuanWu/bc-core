@@ -40,16 +40,20 @@ parser = argparse.ArgumentParser(description="wqb量化因子同步脚本")
 parser.add_argument(
     "-s", type=str, help="指令代码: g-生成一阶因子, s-回测同步数据, f-抓取同步信息"
 )
+parser.add_argument(
+    "-t", type=str, default="3,5,6", help="模板ID列表，逗号分隔，默认: 3,5,6"
+)
+parser.add_argument(
+    "-b", type=int, default=500, help="每次批量生成的因子数量，默认: 500"
+)
 
 
 async def main():
     args = parser.parse_args()
-    template_ids = getattr(args, "t", "3,5,6")
-    batch_size = getattr(args, "b", 500)
     strategy = ThreeLevelStrategy(
-        template_ids=tuple(int(i) for i in template_ids.split(",")),
+        template_ids=tuple(int(i) for i in args.t.split(",")),
         regions=["GLB", "ASI", "EUR", "USA"],
-        batch_size=batch_size,
+        batch_size=args.b,
     )
     if args.s == "g1":
         strategy.generate_first_level_alpha(db)

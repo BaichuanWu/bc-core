@@ -33,11 +33,6 @@ def iso_with_tz(days_offset=0, tz_offset_hours=-4):
     return dt_offset.isoformat(timespec="seconds")
 
 
-strategy = ThreeLevelStrategy(
-    template_ids=(3, 5, 6), regions=["GLB", "ASI", "EUR", "USA"], batch_size=100
-)
-
-
 # 1. 创建解析器
 parser = argparse.ArgumentParser(description="wqb量化因子同步脚本")
 
@@ -49,6 +44,13 @@ parser.add_argument(
 
 async def main():
     args = parser.parse_args()
+    template_ids = getattr(args, "t", "3,5,6")
+    batch_size = getattr(args, "b", 500)
+    strategy = ThreeLevelStrategy(
+        template_ids=tuple(int(i) for i in template_ids.split(",")),
+        regions=["GLB", "ASI", "EUR", "USA"],
+        batch_size=batch_size,
+    )
     if args.s == "g1":
         strategy.generate_first_level_alpha(db)
     elif args.s == "g2":
@@ -60,7 +62,7 @@ async def main():
     elif args.s == "f":
         wqb_client.fetch_simulate_alpha(
             db,
-            date_created=FilterRange.from_str(f"[{iso_with_tz(0)},{iso_with_tz(-1)})"),
+            date_created=FilterRange.from_str(f"[{iso_with_tz(1)},{iso_with_tz(-1)})"),
         )
     db.commit()
 

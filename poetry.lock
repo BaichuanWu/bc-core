@@ -92,6 +92,29 @@ url = "https://pypi.tuna.tsinghua.edu.cn/simple"
 reference = "tsinghua"
 
 [[package]]
+name = "bc-fastkit"
+version = "0.1.0"
+description = ""
+optional = false
+python-versions = ">=3.12"
+groups = ["main"]
+files = []
+develop = false
+
+[package.dependencies]
+aiomysql = ">=0.2.0,<0.3.0"
+fastapi = ">=0.117.1,<0.118.0"
+humps = ">=0.2.2,<0.3.0"
+pydantic-settings = ">=2.11.0,<3.0.0"
+sqlalchemy = {version = ">=2.0.43,<3.0.0", extras = ["asyncio"]}
+
+[package.source]
+type = "git"
+url = "ssh://git@github.com/BaichuanWu/bc-fastkit.git"
+reference = "HEAD"
+resolved_reference = "9f21b8979cc8f8a03dde4437bd53c0d0bf3d06f9"
+
+[[package]]
 name = "certifi"
 version = "2025.7.14"
 description = "Python package for providing Mozilla's CA Bundle."
@@ -1806,4 +1829,4 @@ reference = "tsinghua"
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.12"
-content-hash = "49e1b14ca11f8d2e963f569b21b88768099bf5dfad72e1623a899d85826eca49"
+content-hash = "7f69ba1bec78ee407e8ed9ae539eea6967632fd91e6e1295cb010e0463c57d45"

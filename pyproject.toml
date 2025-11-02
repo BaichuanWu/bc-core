@@ -44,6 +44,7 @@ dependencies = [
     "wqb (>=0.2.5,<0.3.0)",
     "humps (>=0.2.2,<0.3.0)",
     "sqlmodel (>=0.0.25,<0.0.26)",
+    "bc-fastkit @ git+ssh://git@github.com/BaichuanWu/bc-fastkit.git",
 ]
 
 
@@ -58,10 +59,7 @@ url = "https://pypi.tuna.tsinghua.edu.cn/simple"
 priority = "primary"
 
 [tool.poetry.dependencies]
-bc-fastkit = [
-    { path = "../bc-fastkit", develop = true, optional = true },
-    { git = "https://github.com/alianwbc/bc-fastkit.git", rev = "main" }
-]
+bc-fastkit = {develop = true}
 
 
 [tool.poetry.group.dev.dependencies]
